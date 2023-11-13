@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Textarea History</title>
+  <style>
+    #textAreaContainer {
+      position: relative;
+    }
+
+    #historyButtons {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: flex;
+    }
+
+    #historyButtons button {
+      margin-left: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div id="textAreaContainer">
+  <div id="historyButtons">
+    <button onclick="navigateHistory(-1)">←</button>
+    <button onclick="navigateHistory(1)">→</button>
+  </div>
+  <textarea id="historyTextarea" rows="5" cols="50" oninput="saveToHistory()"></textarea>
+</div>
+
+<script>
+  var historyIndex = -1;
+  var historyData = getFromLocalStorage("textareaHistory") || [];
+
+  var textarea = document.getElementById("historyTextarea");
+
+  function saveToHistory() {
+    var currentValue = textarea.value;
+
+    historyData.push(currentValue);
+
+    historyIndex = historyData.length - 1;
+
+    saveToLocalStorage("textareaHistory", historyData);
+  }
+
+  function navigateHistory(direction) {
+    historyIndex += direction;
+
+    historyIndex = Math.min(Math.max(historyIndex, 0), historyData.length - 1);
+
+    textarea.value = historyData[historyIndex];
+  }
+
+  function getFromLocalStorage(key) {
+    try {
+      return JSON.parse(localStorage.getItem(key));
+    } catch (error) {
+      console.error("Error parsing localStorage:", error);
+      return null;
+    }
+  }
+
+  function saveToLocalStorage(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      console.error("Error saving to localStorage:", error);
+    }
+  }
+</script>
+
+</body>
+</html>
